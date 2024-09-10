@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISL Content Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        #output {
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+        .typing-effect {
+            display: inline-block;
+            border-right: 2px solid;
+            animation: typing 2s steps(22) 1s infinite normal both, blink 500ms steps(22) infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink {
+            from, to { border-color: transparent }
+            50% { border-color: black }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .microphone-icon {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+        .progress-bar-container {
+            margin-top: 20px;
+            height: 20px;
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #007bff;
+            transition: width 0.3s;
+        }
+        .suggestion-list {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            max-height: 150px;
+            overflow-y: auto;
+            border-radius: 0.25rem;
+            margin-top: 5px;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .gesture-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            vertical-align: middle;
+            transition: transform 0.2s;
+        }
+        .gesture-icon:hover {
+            transform: scale(1.2);
+            animation: rotateIcon 1s linear infinite;
+        }
+        @keyframes rotateIcon {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .rotate-on-click {
+            animation: rotate 0.5s;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">ISL Content Generator</h1>
+        <div class="form-group">
+            <label for="inputText">Enter Text (Hindi/English):</label>
+            <div class="input-group">
+                <input type="text" id="inputText" class="form-control" placeholder="Type here...">
+                <div class="input-group-append">
+                    <button id="speakBtn" class="btn btn-secondary microphone-icon">🎤</button>
+                </div>
+            </div>
+            <div id="suggestions" class="suggestion-list"></div>
+        </div>
+        <button id="translateBtn" class="btn btn-primary">Translate to ISL</button>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div id="output" class="text-center"></div>
+        <button id="toggleModeBtn" class="btn btn-link">Toggle Dark/Light Mode</button>
+        <div class="floating-btn" id="resetBtn">🔄</div>
+
+        <!-- Custom Gesture Addition -->
+        <div class="form-group mt-3">
+            <label for="customWord">Add Custom Gesture:</label>
+            <input type="text" id="customWord" class="form-control" placeholder="Enter word">
+            <input type="text" id="customGesture" class="form-control mt-2" placeholder="Enter gesture icon or text">
+            <button id="addGestureBtn" class="btn btn-success mt-2">Add Gesture</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/2.7.0/tf.min.js"></script>
+    <script>
+        const gestures = {
+            "hello": { text: "👋 (Hello Gesture)", icon: "👋" },
+            "world": { text: "🌍 (World Gesture)", icon: "🌍" },
+            "thank you": { text: "🙏 (Thank You Gesture)", icon: "🙏" },
+            "yes": { text: "👍 (Yes Gesture)", icon: "👍" },
+            "no": { text: "👎 (No Gesture)", icon: "👎" },
+            "please": { text: "🙌 (Please Gesture)", icon: "🙌" },
+            "sorry": { text: "😔 (Sorry Gesture)", icon: "😔" },
+            "goodbye": { text: "👋 (Goodbye Gesture)", icon: "👋" },
+            "good morning": { text: "☀️ (Good Morning Gesture)", icon: "☀️" },
+            "good night": { text: "🌙 (Good Night Gesture)", icon: "🌙" },
+        };
+
+        // Dark/Light Mode Toggle
+        document.getElementById('toggleModeBtn').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            this.classList.add('rotate-on-click');
+            setTimeout(() => {
+                this.classList.remove('rotate-on-click');
+            }, 500);
+        });
+
+        // Speech-to-Text
+        document.getElementById('speakBtn').addEventListener('click', function() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-IN';
+            recognition.start();
+            recognition.onresult = function(event) {
+                document.getElementById('inputText').value = event.results[0][0].transcript;
+                updateSuggestions(event.results[0][0].transcript);
+            };
+        });
+
+        // Translate and display ISL gestures with typing effect and animation
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputText').value;
+            if (inputText.trim() === "") {
+                alert("Please enter some text.");
+                return;
+            }
+        
+            const outputDiv = document.getElementById('output');
+            const progressBar = document.getElementById('progressBar');
+            outputDiv.innerHTML = "<h3 class='typing-effect'>ISL Translation:</h3>";
+            progressBar.style.width = '0%';
+        
+            const words = inputText.split(" ");
+            words.forEach((word, index) => {
+                setTimeout(() => {
+                    let gesture = gestures[word.toLowerCase()];
+                    progressBar.style.width = `${((index + 1) / words.length) * 100}%`;
+                    if (gesture) {
+                        outputDiv.innerHTML += `<p><img src="${gesture.icon}" class="gesture-icon">${gesture.text}</p>`;
+                        speak(gesture.text);
+                    } else {
+                        outputDiv.innerHTML += `<p>${word}</p>`;
+                    }
+                }, index * 500);
+            });
+        });
+        
+        // Function to add custom gestures
+        document.getElementById('addGestureBtn').addEventListener('click', function() {
+            const customWord = document.getElementById('customWord').value.trim().toLowerCase();
+            const customGesture = document.getElementById('customGesture').value.trim();
+            if (customWord && customGesture) {
+                gestures[customWord] = { text: `${customGesture} (Custom Gesture)`, icon: customGesture };
+                alert(`Custom gesture for "${customWord}" added successfully!`);
+            } else {
+                alert("Please fill in both fields.");
+            }
+        });
+        
+
+        // Function to update suggestions as the user types
+        document.getElementById('inputText').addEventListener('input', function() {
+            updateSuggestions(this.value);
+        });
+
+        // Function to update suggestions
+        function updateSuggestions(text) {
+            const suggestionList = document.getElementById('suggestions');
+            suggestionList.innerHTML = '';
+            const words = text.split(" ");
+            words.forEach(word => {
+                const gesture = gestures[word.toLowerCase()];
+                if (gesture) {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.className = 'suggestion-item';
+                    suggestionItem.textContent = gesture.text;
+                    suggestionItem.addEventListener('click', () => {
+                        document.getElementById('inputText').value = word;
+                        suggestionList.innerHTML = '';
+                    });
+                    suggestionList.appendChild(suggestionItem);
+                }
+            });
+        }
+
+        // Function to reset the application
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('progressBar').style.width = '0%';
+        });
+
+        // Function to simulate speaking the gesture text
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+    </script>
+</body>
+</html>

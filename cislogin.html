@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>CIS Benchmark - Login</title>
+  <style>
+    /* Base Styling */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Times New Roman', Times, serif;
+      background: linear-gradient(45deg, #0d2e5a, #7fbbd6);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Background Animation */
+    @keyframes bgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      background-size: 200% 200%;
+      animation: bgAnimation 10s ease infinite;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      z-index: 1;
+    }
+
+    h2 {
+      margin: 0;
+      padding: 0 0 20px;
+      color: #fff;
+      text-align: center;
+      font-size: 2em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Login Box Styling */
+    .login-box {
+      position: relative;
+      padding: 40px;
+      background: rgba(0, 0, 0, 0.8);
+      text-align: center;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      overflow: hidden;
+      transform: translateY(50px);
+      animation: fadeInUp 1.5s ease-out forwards;
+    }
+
+    /* Login Box Animation */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(50px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-box {
+      position: relative;
+      margin: 30px 0;
+    }
+
+    .user-box input {
+      width: 100%;
+      padding: 10px 0;
+      font-size: 16px;
+      color: #fff;
+      margin-bottom: 10px;
+      border: none;
+      border-bottom: 1px solid #fff;
+      outline: none;
+      background: transparent;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .user-box label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 10px 0;
+      font-size: 16px;
+      color: #fff;
+      pointer-events: none;
+      transition: 0.5s;
+    }
+
+    .user-box input:focus ~ label, 
+    .user-box input:valid ~ label {
+      top: -20px;
+      left: 0;
+      color: #7fbbd6;
+      font-size: 12px;
+    }
+
+    /* Animated Login Button */
+    .button-box {
+      position: relative;
+    }
+
+    .login-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 16px;
+      text-transform: uppercase;
+      text-decoration: none;
+      letter-spacing: 4px;
+      margin-top: 20px;
+      background: #0d2e5a;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: 0.5s;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+
+    .login-btn:hover {
+      background: #7fbbd6;
+      color: #0d2e5a;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .login-btn span {
+      position: absolute;
+      display: block;
+    }
+
+    .login-btn span:nth-child(1) {
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7fbbd6);
+      animation: btnAnimate1 1s linear infinite;
+    }
+
+    .login-btn span:nth-child(2) {
+      bottom: 0;
+      right: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7fbbd6);
+      animation: btnAnimate2 1s linear infinite;
+    }
+
+    .login-btn span:nth-child(3) {
+      top: -100%;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #7fbbd6);
+      animation: btnAnimate3 1s linear infinite;
+    }
+
+    .login-btn span:nth-child(4) {
+      bottom: -100%;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #7fbbd6);
+      animation: btnAnimate4 1s linear infinite;
+    }
+
+    /* Button Hover Animation */
+    @keyframes btnAnimate1 {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
+    }
+
+    @keyframes btnAnimate2 {
+      0% { right: -100%; }
+      50%, 100% { right: 100%; }
+    }
+
+    @keyframes btnAnimate3 {
+      0% { top: -100%; }
+      50%, 100% { top: 100%; }
+    }
+
+    @keyframes btnAnimate4 {
+      0% { bottom: -100%; }
+      50%, 100% { bottom: 100%; }
+    }
+
+    /* Floating Background Bubbles */
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 40px;
+      height: 40px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      animation: rise 10s infinite ease-in-out;
+      opacity: 0.5;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-1200px);
+      }
+    }
+
+    .bubble:nth-child(2) { width: 60px; height: 60px; animation-duration: 8s; left: 10%; }
+    .bubble:nth-child(3) { width: 100px; height: 100px; animation-duration: 12s; left: 70%; }
+    .bubble:nth-child(4) { width: 80px; height: 80px; animation-duration: 14s; left: 50%; }
+    .bubble:nth-child(5) { width: 120px; height: 120px; animation-duration: 18s; left: 80%; }
+
+    /* Password Visibility Toggle */
+    .password-visibility {
+      display: flex;
+      color: #fff;
+      font-size: 14px;
+      position: relative;
+      left: 150px;
+      bottom: 38px;
+
+    }
+
+    .password-visibility input[type="checkbox"] {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .signup-box {
+      margin-top: 15px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .signup-box a {
+      color: #7fbbd6;
+      text-decoration: none;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    .signup-box a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <h2>CIS Benchmark Login</h2>
+      <form id="loginForm">
+        <div class="user-box">
+          <input type="text" name="username" required>
+          <label>Username</label>
+        </div>
+        <div class="user-box">
+          <input type="password" id="password" name="password" required>
+          <label>Password</label>
+          <div class="password-visibility">
+            <input type="checkbox" id="showPassword">
+          </div>
+        </div>
+        <div class="button-box">
+          <button class="login-btn" type="submit" onclick="submit()">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            Login
+          </button>
+        </div>
+        <div class="signup-box">
+            <a href="cissignup.html">Sign Up</a>
+          </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Bubbles for Extra Animation -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      window.location.href = "cis.html";
+    });
+
+    document.getElementById('showPassword').addEventListener('change', function() {
+      const passwordField = document.getElementById('password');
+      passwordField.type = this.checked ? 'text' : 'password';
+    });
+  </script>
+</body>
+</html>
+ 

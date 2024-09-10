@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIS Benchmark Audit Tool</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        #results-container,
+        #report-customization,
+        #feedback-container,
+        #timeline-container,
+        #workflow-designer,
+        #ai-insights-container,
+        #heatmap-container {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input,
+        select,
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2,
+        h3 {
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #history-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #history-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #history-container li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .collapsible {
+            cursor: pointer;
+        }
+
+        #progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            margin-top: 20px;
+        }
+
+        #progress {
+            width: 0%;
+            height: 30px;
+            background-color: #76c7c0;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+
+        #risk-level {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #go-to-dashboard {
+            background-color: #28a745;
+        }
+
+        #go-to-dashboard:hover {
+            background-color: #218838;
+        }
+
+        .dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-theme .container {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .dark-theme input,
+        .dark-theme select,
+        .dark-theme button {
+            border: 1px solid #666;
+        }
+
+        .dark-theme button {
+            background-color: #0056b3;
+        }
+
+        .dark-theme button:hover {
+            background-color: #003d7a;
+        }
+
+        .chart-annotation {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 4px;
+            pointer-events: none;
+            display: none;
+        }
+
+        #ai-insights {
+            color: #28a745;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        #timeline-slider {
+            width: 100%;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dashboard-container" class="container">
+        <h2>Welcome to the CIS Audit Dashboard</h2>
+        <p>Select the system and type of audit:</p>
+        <form id="audit-form">
+            <label for="os">Operating System:</label>
+            <select id="os" required>
+                <option value="">Select OS</option>
+                <option value="Windows 11">Windows 11</option>
+                <option value="Linux">Linux</option>
+            </select><br>
+            <label for="level">Audit Level:</label>
+            <select id="level" required>
+                <option value="">Select Level</option>
+                <option value="Level 1">CIS Level 1</option>
+                <option value="Level 2">CIS Level 2</option>
+            </select><br>
+            <button type="submit">Start Audit</button>
+            <button type="button" id="toggle-theme">Toggle Dark/Light Theme</button>
+        </form>
+
+        <div id="preview-container" class="hidden">
+            <h3>Selected Configuration</h3>
+            <p id="preview"></p>
+        </div>
+
+        <div id="loader" class="loader hidden"></div>
+
+        <div id="progress-bar" class="hidden">
+            <div id="progress">0%</div>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <h3>Audit Results</h3>
+            <p id="results"></p>
+            <p id="tips"></p>
+            <button id="download-report" class="hidden">Download Report</button>
+            <button id="go-to-dashboard" class="hidden">Go to Dashboard</button>
+            <p id="risk-level"></p>
+        </div>
+
+        <div id="ai-insights-container" class="hidden">
+            <h3>AI-Powered Insights</h3>
+            <p id="ai-insights">Analyzing results...</p>
+        </div>
+
+        <div id="history-container">
+            <h3 class="collapsible" onclick="toggleHistory()">Audit History</h3>
+            <ul id="history-list"></ul>
+        </div>
+
+        <div id="timeline-container">
+            <h3>Timeline</h3>
+            <input type="range" id="timeline-slider" min="1" max="10" value="5">
+            <p id="timeline-output">Day 5</p>
+        </div>
+    </div>
+
+    <script>
+        const auditForm = document.getElementById('audit-form');
+        const loader = document.getElementById('loader');
+        const resultsContainer = document.getElementById('results-container');
+        const downloadReportBtn = document.getElementById('download-report');
+        const riskLevel = document.getElementById('risk-level');
+        const previewContainer = document.getElementById('preview-container');
+        const preview = document.getElementById('preview');
+        const goToDashboardBtn = document.getElementById('go-to-dashboard');
+        const historyList = document.getElementById('history-list');
+        const historyContainer = document.getElementById('history-container');
+        const aiInsightsContainer = document.getElementById('ai-insights-container');
+        const aiInsights = document.getElementById('ai-insights');
+        const themeToggleBtn = document.getElementById('toggle-theme');
+        let darkTheme = false;
+        let auditHistory = [];
+
+        auditForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const os = document.getElementById('os').value;
+            const level = document.getElementById('level').value;
+            previewContainer.classList.remove('hidden');
+            preview.textContent = `Operating System: ${os}, Audit Level: ${level}`;
+
+            loader.classList.remove('hidden');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                downloadReportBtn.classList.remove('hidden');
+                goToDashboardBtn.classList.remove('hidden');
+                riskLevel.textContent = 'Risk Level: Moderate'; // Example Risk Level
+
+                aiInsights.textContent = 'AI insights are being generated...';
+                aiInsightsContainer.classList.remove('hidden');
+
+                // Simulate AI Insights
+                setTimeout(() => {
+                    aiInsights.textContent = 'AI insights: The system is generally secure but has a few areas for improvement.';
+                }, 2000);
+
+                auditHistory.push(`OS: ${os}, Level: ${level}`);
+                updateHistory();
+                updateProgress();
+            }, 2000);
+        });
+
+        downloadReportBtn.addEventListener('click', () => {
+            alert('Download report functionality is not yet implemented.');
+        });
+
+        goToDashboardBtn.addEventListener('click', () => {
+           window.location.href = "dashboardCIS.html";
+        });
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            auditHistory.forEach((entry) => {
+                const li = document.createElement('li');
+                li.textContent = entry;
+                historyList.appendChild(li);
+            });
+        }
+
+        function updateProgress() {
+            const progressElement = document.getElementById('progress');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress > 100) {
+                    clearInterval(interval);
+                }
+                progressElement.style.width = `${progress}%`;
+                progressElement.textContent = `${progress}%`;
+            }, 500);
+        }
+
+        function toggleHistory() {
+            historyContainer.classList.toggle('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            darkTheme = !darkTheme;
+        });
+
+        document.getElementById('timeline-slider').addEventListener('input', (event) => {
+            document.getElementById('timeline-output').textContent = `Day ${event.target.value}`;
+        });
+    </script>
+</body>
+
+</html>

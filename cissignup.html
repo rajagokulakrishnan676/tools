@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sign Up - CIS Benchmark</title>
+  <style>
+    /* Base Styling */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Times New Roman', Times, serif;
+      background: linear-gradient(45deg, #0d2e5a, #7fbbd6);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Sign Up Box Styling */
+    .signup-box {
+      position: relative;
+      padding: 40px;
+      background: rgba(0, 0, 0, 0.8);
+      text-align: center;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .signup-box h2 {
+      margin: 0;
+      padding: 0 0 20px;
+      color: #fff;
+      text-align: center;
+      font-size: 2em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .signup-box .user-box {
+      position: relative;
+      margin: 30px 0;
+    }
+
+    .signup-box .user-box input {
+      width: 100%;
+      padding: 10px 0;
+      font-size: 16px;
+      color: #fff;
+      margin-bottom: 10px;
+      border: none;
+      border-bottom: 1px solid #fff;
+      outline: none;
+      background: transparent;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .signup-box .user-box label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 10px 0;
+      font-size: 16px;
+      color: #fff;
+      pointer-events: none;
+      transition: 0.5s;
+    }
+
+    .signup-box .user-box input:focus ~ label,
+    .signup-box .user-box input:valid ~ label {
+      top: -20px;
+      left: 0;
+      color: #7fbbd6;
+      font-size: 12px;
+    }
+
+    .signup-box .button-box {
+      position: relative;
+    }
+
+    .signup-box .signup-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 16px;
+      text-transform: uppercase;
+      text-decoration: none;
+      letter-spacing: 4px;
+      margin-top: 20px;
+      background: #0d2e5a;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: 0.5s;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+
+    .signup-box .signup-btn:hover {
+      background: #7fbbd6;
+      color: #0d2e5a;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .signup-box .signup-btn span {
+      position: absolute;
+      display: block;
+    }
+
+    .signup-box .signup-btn span:nth-child(1) {
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7fbbd6);
+      animation: btnAnimate1 1s linear infinite;
+    }
+
+    .signup-box .signup-btn span:nth-child(2) {
+      bottom: 0;
+      right: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7fbbd6);
+      animation: btnAnimate2 1s linear infinite;
+    }
+
+    .signup-box .signup-btn span:nth-child(3) {
+      top: -100%;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #7fbbd6);
+      animation: btnAnimate3 1s linear infinite;
+    }
+
+    .signup-box .signup-btn span:nth-child(4) {
+      bottom: -100%;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #7fbbd6);
+      animation: btnAnimate4 1s linear infinite;
+    }
+
+    /* Button Hover Animation */
+    @keyframes btnAnimate1 {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
+    }
+
+    @keyframes btnAnimate2 {
+      0% { right: -100%; }
+      50%, 100% { right: 100%; }
+    }
+
+    @keyframes btnAnimate3 {
+      0% { top: -100%; }
+      50%, 100% { top: 100%; }
+    }
+
+    @keyframes btnAnimate4 {
+      0% { bottom: -100%; }
+      50%, 100% { bottom: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h2>Create an Account</h2>
+    <form id="signupForm">
+      <div class="user-box">
+        <input type="text" name="username" required>
+        <label>Username</label>
+      </div>
+      <div class="user-box">
+        <input type="email" name="email" required>
+        <label>Email</label>
+      </div>
+      <div class="user-box">
+        <input type="password" name="password" required>
+        <label>Password</label>
+      </div>
+      <div class="button-box">
+        <button class="signup-btn" type="submit" onclick="submit()">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          Sign Up
+        </button>
+      </div>
+    </form>
+  </div>
+  <script>
+
+document.getElementById('signupForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      window.location.href = "cis.html";
+    });
+
+    function submit(){
+        window.location.href = "cis.html";
+    }
+  </script>
+</body>
+</html>
